@@ -1,4 +1,8 @@
 # llm-shell-sandbox
 A dockerized sandbox for LLMs to run shell commands and code.
 
-To run the application, clone the repository, `cd` into the newly created `llm-shell-sandbox` directory, and run the command `docker compose up --build -d`. You can then access the web interface at `http://localhost:5220`. You may want to change the `MAX_COMMANDS` and `ALLOWED_COMMANDS` options in `main.py` before building the container image, to change the commands the LLM has access to and how many it is allowed to run in accomplishing a given task. The application assumes that you are running ollama on your local system at `http://host.docker.internal:11434`.
+## Usage
+To run the application, clone the repository, `cd` into the newly created `llm-shell-sandbox` directory, and run the command `cp .env.example .env` to create a valid `.env` file. You can then change the environment variables to your desired values, including specifying the ollama model to use, the temperature, context length, and maximum number of commands to run. You can then run the command `docker compose up --build -d` and access the web interface at `http://localhost:5220` (assuming you haven't modified the port in the `.env` file).
+
+## Upcoming Changes & Features
+Currently, the application only works well with relatively simple tasks. You can pass additional tasks after each has completed, but it does not work well at accomplishing complex tasks in one shot. Next steps would be to incorporate a context management system to allow for more granular tracking of the state of the task and directory structure, and to make it easier to take actions outside of the shell and run code or use tools created by the LLM

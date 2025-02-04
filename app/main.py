@@ -3,14 +3,22 @@ import subprocess
 import json
 from flask import Flask, request, jsonify, send_from_directory
 import requests
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__, static_url_path='', static_folder='static')
 
 # Configuration
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://host.docker.internal:11434/api/chat")
 MODEL_NAME = os.getenv("OLLAMA_MODEL_NAME", "mistral-nemo:12b-instruct-2407-fp16")
-TIMEOUT = 60  # seconds
-MAX_COMMANDS = int(os.getenv("MAX_COMMANDS", 5))  # Maximum number of commands per task
+TEMPERATURE = float(os.getenv("OLLAMA_TEMPERATURE", "0.7"))
+CONTEXT_LENGTH = int(os.getenv("OLLAMA_CONTEXT_LENGTH", "4096"))
+TIMEOUT = int(os.getenv("TIMEOUT_SECONDS", "120"))  # seconds
+MAX_COMMANDS = int(os.getenv("MAX_COMMANDS", "10"))  # Maximum number of commands per task
+FLASK_PORT = int(os.getenv("FLASK_PORT", "5220"))
+FLASK_HOST = os.getenv("FLASK_HOST", "0.0.0.0")
 
 # Allowed commands whitelist (for security)
 ALLOWED_COMMANDS = [
@@ -25,7 +33,9 @@ ALLOWED_COMMANDS = [
     "mv",
     "grep",
     "find",
-    # Add more allowed commands as needed
+    "python",
+    "python3",
+    "pip"
 ]
 
 def sanitize_command(command):
@@ -47,11 +57,16 @@ def get_shell_command(messages):
     payload = {
         "model": MODEL_NAME,
         "messages": messages,
-        "stream": False  # Disable streaming for simplicity
+        "stream": False,  # Disable streaming for simplicity
+        "options": {
+            "temperature": TEMPERATURE,
+            "num_ctx": CONTEXT_LENGTH
+        }
     }
 
     print("\n=== LLM Request ===")
     print("Messages:", json.dumps(messages, indent=2))
+    print("Configuration:", json.dumps(payload["options"], indent=2))
     
     response = requests.post(OLLAMA_API_URL, json=payload, headers=headers, timeout=TIMEOUT)
     response.raise_for_status()
@@ -104,7 +119,7 @@ def execute():
             "role": "system",
             "content": (
                 "You are an AI assistant that helps execute shell commands based on the user's task. "
-                "Provide only the necessary shell commands to accomplish the task. "
+                "Provide only the necessary shell commands to accomplish the task. Output only one command at a time."
                 "Do not output commands inside of ``` characters. Output only the content of the command. "
                 "After each command, evaluate if the task is complete based on the command output. "
                 "If the task is complete, respond with exactly 'TASK_COMPLETE'. "
@@ -170,4 +185,4 @@ def execute():
     }), 200
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5220)
+    app.run(host=FLASK_HOST, port=FLASK_PORT)

@@ -1,11 +1,17 @@
-version: '3.8'
-
 services:
   llm-shell:
     container_name: llm-shell
     build: .
     ports:
-      - "5220:5220"
+      - "${FLASK_PORT}:${FLASK_PORT}"
+    env_file:
+      - .env
     environment:
-      - OLLAMA_API_URL=http://host.docker.internal:11434/api/chat
-      - OLLAMA_MODEL_NAME=mistral-nemo:12b-instruct-2407-fp16
+      - OLLAMA_API_URL=${OLLAMA_API_URL}
+      - OLLAMA_MODEL_NAME=${OLLAMA_MODEL_NAME}
+      - OLLAMA_TEMPERATURE=${OLLAMA_TEMPERATURE}
+      - OLLAMA_CONTEXT_LENGTH=${OLLAMA_CONTEXT_LENGTH}
+      - MAX_COMMANDS=${MAX_COMMANDS}
+      - TIMEOUT_SECONDS=${TIMEOUT_SECONDS}
+      - FLASK_PORT=${FLASK_PORT}
+      - FLASK_HOST=${FLASK_HOST}

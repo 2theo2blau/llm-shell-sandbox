@@ -81,24 +81,29 @@ def execute():
     if not task:
         return jsonify({"error": "No task provided."}), 400
 
-    # Initialize conversation history
+    # Initialize conversation history with improved system prompt
     messages = [
         {
             "role": "system",
-            "content": "You are an AI assistant that helps execute shell commands based on the user's task. "
-                       "Provide only the necessary shell commands to accomplish the task. "
-                       "Do not output commands inside of ``` characters. Output only the content of the command."
-                       "After each command, wait for the output before suggesting the next command."
-                       "If the task is complete, output 'No further commands are needed.'"
+            "content": (
+                "You are an AI assistant that helps execute shell commands based on the user's task. "
+                "Provide only the necessary shell commands to accomplish the task. "
+                "Do not output commands inside of ``` characters. Output only the content of the command. "
+                "After each command, evaluate if the task is complete based on the command output. "
+                "If the task is complete, respond with exactly 'TASK_COMPLETE'. "
+                "Consider all previously executed commands and their outputs when determining if additional commands are needed. "
+                "Avoid repeating commands unless absolutely necessary."
+            )
         },
         {
             "role": "user",
-            "content": f"Task: {task}"
+            "content": f"Task: {task}\nPreviously executed commands: []"
         }
     ]
 
     command_count = 0
     final_output = ""
+    executed_commands = []
 
     while command_count < MAX_COMMANDS:
         try:
@@ -106,12 +111,17 @@ def execute():
         except Exception as e:
             return jsonify({"error": f"Failed to get command from LLM: {str(e)}"}), 500
 
+        # Check if the model indicates task completion
+        if command.strip() == "TASK_COMPLETE":
+            break
+
         # Sanitize and validate the command
         is_valid, error_msg = sanitize_command(command)
         if not is_valid:
             return jsonify({"error": error_msg}), 400
 
         execution_result = execute_command(command)
+        executed_commands.append(command)
 
         # Append the executed command and its output to the conversation history
         messages.append({
@@ -120,20 +130,21 @@ def execute():
         })
         messages.append({
             "role": "user",
-            "content": execution_result.get("output", "")
+            "content": (
+                f"Command output: {execution_result.get('output', '')}\n"
+                f"Current task status: {task}\n"
+                f"Previously executed commands: {json.dumps(executed_commands)}\n"
+                "If the task is complete, respond with exactly 'TASK_COMPLETE'. "
+                "Otherwise, provide the next command needed."
+            )
         })
 
         final_output += f"Command: {command}\nOutput:\n{execution_result.get('output', '')}\n\n"
 
         if not execution_result.get("success", False):
-            # If command execution failed, stop the loop
             break
 
         command_count += 1
-
-        # Check if the assistant wants to stop
-        if "No further commands are needed." in execution_result.get("output", ""):
-            break
 
     return jsonify({
         "task": task,

@@ -9,15 +9,3 @@ services:
     environment:
       - OLLAMA_API_URL=http://host.docker.internal:11434/api/chat
       - OLLAMA_MODEL_NAME=mistral-nemo:12b-instruct-2407-fp16
-#     depends_on:
-#       - ollama
-
-#   ollama:
-#     image: ollama/ollama:latest
-#     ports:
-#       - "11434:11434"
-#     volumes:
-#       - ollama_data:/root/.ollama
-
-# volumes:
-#   ollama_data: 

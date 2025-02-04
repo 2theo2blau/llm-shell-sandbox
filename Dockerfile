@@ -5,6 +5,9 @@ FROM python:3.10-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+# Install tree command
+RUN apt-get update && apt-get install -y tree && rm -rf /var/lib/apt/lists/*
+
 # Set work directory
 WORKDIR /app
 
@@ -17,7 +20,7 @@ RUN pip install -r requirements.txt
 COPY app/ .
 
 # Expose the port
-EXPOSE 5000
+EXPOSE 5220
 
 # Define the default command
 CMD ["python", "main.py"]

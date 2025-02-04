@@ -1,0 +1,41 @@
+.directory-tree {
+    font-family: monospace;
+    white-space: pre;
+    overflow-x: auto;
+    height: 400px;
+    overflow-y: auto;
+}
+
+.command-history {
+    height: 400px;
+    overflow-y: auto;
+    font-family: monospace;
+}
+
+.command-entry {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border-left: 3px solid #007bff;
+    background-color: #f8f9fa;
+}
+
+.command-text {
+    color: #0056b3;
+    font-weight: bold;
+}
+
+.command-output {
+    white-space: pre-wrap;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background-color: #f1f1f1;
+    border-radius: 4px;
+}
+
+.error-output {
+    color: #dc3545;
+}
+
+.success-output {
+    color: #28a745;
+} 

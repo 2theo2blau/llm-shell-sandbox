@@ -1,10 +1,10 @@
 import os
 import subprocess
 import json
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import requests
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='', static_folder='static')
 
 # Configuration
 OLLAMA_API_URL = os.getenv("OLLAMA_API_URL", "http://host.docker.internal:11434/api/chat")
@@ -72,6 +72,23 @@ def execute_command(command):
         return {"success": False, "output": e.output}
     except subprocess.TimeoutExpired:
         return {"success": False, "output": "Command timed out."}
+
+@app.route('/')
+def index():
+    return send_from_directory(app.static_folder, 'index.html')
+
+@app.route('/ls')
+def list_directory():
+    try:
+        # Use tree command if available, otherwise fallback to ls
+        try:
+            result = subprocess.check_output(['tree', '/app'], text=True)
+        except FileNotFoundError:
+            result = subprocess.check_output(['ls', '-R', '/app'], text=True)
+        
+        return jsonify({"success": True, "output": result})
+    except subprocess.CalledProcessError as e:
+        return jsonify({"success": False, "error": str(e), "output": e.output}), 500
 
 @app.route('/execute', methods=['POST'])
 def execute():

@@ -38,4 +38,104 @@
 
 .success-output {
     color: #28a745;
+}
+
+/* Task list styles */
+.task-list {
+    height: 400px;
+    overflow-y: auto;
+}
+
+.task-description {
+    font-weight: 500;
+}
+
+.task-list .list-group-item {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.task-list .list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.task-list .list-group-item.active {
+    background-color: #e9f0ff;
+    border-color: #b8d4ff;
+    color: inherit;
+}
+
+/* Task details styles */
+.task-details {
+    height: 400px;
+    overflow-y: auto;
+}
+
+.task-header {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.commands-list {
+    margin-top: 1rem;
+}
+
+/* Filesystem changes styles */
+.filesystem-changes {
+    height: 400px;
+    overflow-y: auto;
+    font-family: monospace;
+}
+
+.changes-list {
+    margin-top: 1rem;
+}
+
+.change-item {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+}
+
+.change-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.change-path {
+    font-weight: 500;
+    word-break: break-all;
+}
+
+.change-details {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5rem;
+    margin-left: 1.5rem;
+}
+
+.change-created {
+    border-left: 3px solid #28a745;
+}
+
+.change-modified {
+    border-left: 3px solid #ffc107;
+}
+
+.change-deleted {
+    border-left: 3px solid #dc3545;
+}
+
+/* Python code tab styles */
+.python-output {
+    height: 200px;
+    overflow-y: auto;
+    font-family: monospace;
+}
+
+pre {
+    margin-bottom: 0;
 } 

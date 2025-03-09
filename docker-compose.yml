@@ -1,9 +1,11 @@
+version: '3'
+
 services:
   llm-shell:
     container_name: llm-shell
     build: .
     ports:
-      - "${FLASK_PORT}:${FLASK_PORT}"
+      - "5220:5220"
     env_file:
       - .env
     environment:
@@ -13,5 +15,9 @@ services:
       - OLLAMA_CONTEXT_LENGTH=${OLLAMA_CONTEXT_LENGTH}
       - MAX_COMMANDS=${MAX_COMMANDS}
       - TIMEOUT_SECONDS=${TIMEOUT_SECONDS}
-      - FLASK_PORT=${FLASK_PORT}
-      - FLASK_HOST=${FLASK_HOST}
+      - FLASK_PORT=5220
+      - FLASK_HOST=0.0.0.0
+      - FLASK_DEBUG=${FLASK_DEBUG:-False}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///app/data/llm_shell.db}
+    volumes:
+      - ./app/data:/app/data
